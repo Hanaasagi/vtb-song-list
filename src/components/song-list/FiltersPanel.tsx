@@ -1,0 +1,161 @@
+import type { ChangeEvent } from 'react';
+import { siteConfig } from '../../config/site';
+import type { SongDatasetMeta, SongFiltersState } from '../../types/song';
+import { RandomCopyButton } from './RandomCopyButton';
+
+interface FiltersPanelProps {
+	filters: SongFiltersState;
+	meta: SongDatasetMeta;
+	onSearchChange: (value: string) => void;
+	onGroupSelect: (value: string | null) => void;
+	onLanguageChange: (value: string | null) => void;
+	onArtistChange: (value: string | null) => void;
+	onReset: () => void;
+	onRandomCopy: () => void;
+	randomDisabled?: boolean;
+}
+
+/**
+ * 顶部筛选面板，包含搜索框、过滤选择与字母/假名导航。
+ */
+export const FiltersPanel = ({
+	filters,
+	meta,
+	onSearchChange,
+	onGroupSelect,
+	onLanguageChange,
+	onArtistChange,
+	onReset,
+	onRandomCopy,
+	randomDisabled = false,
+}: FiltersPanelProps) => {
+	const handleSelectChange =
+		(callback: (value: string | null) => void) => (event: ChangeEvent<HTMLSelectElement>) => {
+			callback(event.target.value || null);
+		};
+
+	const assetBase =
+		(import.meta.env.BASE_URL ?? '/') === '/'
+			? '/'
+			: `${(import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')}/`;
+	const avatarSrc = siteConfig.profile.avatar.startsWith('http')
+		? siteConfig.profile.avatar
+		: `${assetBase}${siteConfig.profile.avatar.replace(/^\/+/, '')}`;
+
+	return (
+		<section className="glass-panel mb-8 space-y-6 p-6 shadow-card">
+			<header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+				<div className="flex items-start gap-4">
+					<div className="group relative aspect-square w-20 overflow-hidden rounded-full border border-border shadow-lg shadow-highlight/40 md:w-24">
+						<img
+							src={avatarSrc}
+							alt={siteConfig.profile.avatarAlt}
+							loading="lazy"
+							className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:rotate-[360deg] group-hover:scale-105"
+						/>
+						<span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/25 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+					</div>
+
+					<div>
+						<h1 className="text-2xl font-semibold tracking-wide text-text-primary md:text-3xl">
+							{siteConfig.hero.title}
+						</h1>
+						<p className="text-sm text-text-muted md:text-base">
+							{siteConfig.hero.subtitle}
+						</p>
+					</div>
+				</div>
+				<div className="flex w-full flex-row items-stretch gap-2 self-start md:w-36 md:flex-col">
+					<RandomCopyButton
+						disabled={randomDisabled}
+						onRandomCopy={onRandomCopy}
+						label="随机复制"
+						className="flex-1 md:flex-none md:w-full"
+					/>
+					<button
+						type="button"
+						onClick={onReset}
+						className="inline-flex flex-1 justify-center rounded-full border border-border bg-transparent px-4 py-1.5 text-sm text-text-secondary transition hover:border-accent hover:text-accent md:flex-none md:w-full"
+					>
+						重置筛选
+					</button>
+				</div>
+			</header>
+
+			<div className="grid gap-4 md:grid-cols-[2fr,1fr,1fr]">
+				<div className="relative">
+					<span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+						🔍
+					</span>
+					<input
+						type="search"
+						value={filters.searchTerm}
+						onChange={(event) => onSearchChange(event.target.value)}
+						placeholder="输入歌名/歌手，支持拼音与假名"
+						className="w-full rounded-full border border-border bg-surface/70 py-2 pl-11 pr-4 text-sm outline-none transition focus:border-accent focus:bg-surface focus:text-text-primary"
+					/>
+				</div>
+
+				<select
+					value={filters.language ?? ''}
+					onChange={handleSelectChange(onLanguageChange)}
+					className="w-full rounded-full border border-border bg-surface/70 px-4 py-2 text-sm text-text-secondary outline-none transition focus:border-accent focus:text-text-primary"
+				>
+					<option value="">全部语种</option>
+					{meta.languages.map((language) => (
+						<option key={language} value={language}>
+							{language}
+						</option>
+					))}
+				</select>
+
+				<select
+					value={filters.artist ?? ''}
+					onChange={handleSelectChange(onArtistChange)}
+					className="w-full rounded-full border border-border bg-surface/70 px-4 py-2 text-sm text-text-secondary outline-none transition focus:border-accent focus:text-text-primary"
+				>
+					<option value="">全部歌手</option>
+					{meta.artists.map((artist) => (
+						<option key={artist} value={artist}>
+							{artist}
+						</option>
+					))}
+				</select>
+			</div>
+
+			{meta.groupings.length > 0 && (
+				<div className="scrollbar-thin -mx-1 flex gap-2 overflow-x-auto px-1 py-1">
+					<button
+						type="button"
+						onClick={() => onGroupSelect(null)}
+						className={`flex-shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs transition ${
+							!filters.groupKey
+								? 'bg-accent/20 text-accent shadow-inner'
+								: 'bg-surface/70 text-text-secondary hover:bg-surface-hover hover:text-text-primary'
+						}`}
+					>
+						全部
+					</button>
+					{meta.groupings.map((group) => {
+						const active = filters.groupKey === group.key;
+						return (
+							<button
+								type="button"
+								key={group.key}
+								onClick={() => onGroupSelect(group.key)}
+								className={`flex-shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs transition ${
+									active
+										? 'bg-accent/30 text-accent shadow-lg shadow-accent/20'
+										: 'bg-surface/70 text-text-secondary hover:bg-surface-hover hover:text-text-primary'
+								}`}
+							>
+								{group.label}
+							</button>
+						);
+					})}
+				</div>
+			)}
+		</section>
+	);
+};
+

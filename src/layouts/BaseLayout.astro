@@ -1,0 +1,127 @@
+---
+import '../styles/global.css';
+import { siteConfig } from '../config/site';
+import { theme } from '../config/theme';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = siteConfig.meta.title ?? '静态歌单',
+	description = siteConfig.meta.description ?? '探索、搜索与筛选你的歌单收藏。',
+} = Astro.props satisfies Props;
+
+const keywords = siteConfig.meta.keywords?.length ? siteConfig.meta.keywords.join(', ') : null;
+const canonicalUrl = siteConfig.meta.canonical;
+const ogImage = siteConfig.meta.ogImage;
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	name: title,
+	description,
+	url: canonicalUrl,
+	inLanguage: 'zh-CN',
+	publisher: {
+		'@type': 'Organization',
+		name: title,
+		url: canonicalUrl,
+	},
+};
+
+const assetBase =
+	(import.meta.env.BASE_URL ?? '/') === '/'
+		? '/'
+		: `${(import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')}/`;
+const resolveAssetPath = (path: string | undefined) => {
+	if (!path) return undefined;
+	if (/^https?:\/\//.test(path)) return path;
+	return `${assetBase}${path.replace(/^\/+/, '')}`;
+};
+
+const cssVars = Object.entries({
+	'--color-background': theme.palette.background,
+	'--color-surface': theme.palette.surface,
+	'--color-surface-hover': theme.palette.surfaceHover,
+	'--color-primary': theme.palette.primary,
+	'--color-accent': theme.palette.accent,
+	'--color-text-primary': theme.palette.textPrimary,
+	'--color-text-secondary': theme.palette.textSecondary,
+	'--color-text-muted': theme.palette.textMuted,
+	'--color-border': theme.palette.border,
+	'--color-highlight': theme.palette.highlight,
+	'--color-featured': theme.palette.featured,
+	'--color-sc': theme.palette.sc,
+	'--color-toast-background': theme.palette.toastBackground,
+	'--color-toast-text': theme.palette.toastText,
+	'--color-toast-border': theme.palette.toastBorder,
+	'--font-sans': theme.typography.fontSans,
+	'--font-mono': theme.typography.fontMono,
+	'--layout-max-width': theme.layout.maxWidth,
+	'--radius-card': theme.layout.cardRadius,
+	'--shadow-card': '0 30px 60px rgba(0, 0, 0, 0.35)',
+})
+	.map(([key, value]) => `${key}: ${value}`)
+	.join('; ');
+
+const backgroundImage =
+	theme.background.type === 'image'
+		? {
+				src: resolveAssetPath(theme.background.src ?? ''),
+				blur: theme.background.blur ?? true,
+				overlay:
+					theme.background.overlay ?? 'linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.75))',
+		  }
+		: null;
+---
+
+<!DOCTYPE html>
+<html lang="zh-Hans" class="min-h-full">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href={resolveAssetPath('/favicon.svg')} />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		{keywords && <meta name="keywords" content={keywords} />}
+		<link rel="canonical" href={canonicalUrl} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalUrl} />
+		{resolveAssetPath(ogImage) && <meta property="og:image" content={resolveAssetPath(ogImage)} />}
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+	</head>
+	<body class="min-h-screen bg-background text-text-primary antialiased" style={cssVars}>
+		<div class="relative min-h-screen">
+			{backgroundImage ? (
+				<>
+					<img
+						src={backgroundImage.src ?? ''}
+						alt="页面背景"
+						class={`pointer-events-none fixed inset-0 -z-20 h-full w-full object-cover ${
+							backgroundImage.blur ? 'blur-md' : ''
+						}`}
+					/>
+					<div
+						class="pointer-events-none fixed inset-0 -z-10"
+						style={{ background: backgroundImage.overlay }}
+					/>
+				</>
+			) : (
+				<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden opacity-60">
+					<div class="absolute -left-40 top-0 h-96 w-96 rounded-full bg-highlight blur-3xl" />
+					<div class="absolute bottom-0 right-0 h-[32rem] w-[32rem] translate-y-1/3 rounded-full bg-accent/20 blur-3xl" />
+				</div>
+			)}
+
+			<main class="relative mx-auto flex min-h-screen w-full max-w-content flex-col px-4 pb-16 pt-8 md:px-8">
+				<slot />
+			</main>
+		</div>
+	</body>
+</html>
+
