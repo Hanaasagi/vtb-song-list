@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { siteConfig } from '../config/site';
 import { theme } from '../config/theme';
+import { withBase } from '../lib/url/withBase';
 
 interface Props {
 	title?: string;
@@ -31,14 +32,10 @@ const jsonLd = {
 	},
 };
 
-const assetBase =
-	(import.meta.env.BASE_URL ?? '/') === '/'
-		? '/'
-		: `${(import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')}/`;
 const resolveAssetPath = (path: string | undefined) => {
 	if (!path) return undefined;
 	if (/^https?:\/\//.test(path)) return path;
-	return `${assetBase}${path.replace(/^\/+/, '')}`;
+	return withBase(path);
 };
 
 const cssVars = Object.entries({

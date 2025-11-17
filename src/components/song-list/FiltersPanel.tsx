@@ -1,5 +1,6 @@
 import type { ChangeEvent } from 'react';
 import { siteConfig } from '../../config/site';
+import { withBase } from '../../lib/url/withBase';
 import type { SongDatasetMeta, SongFiltersState } from '../../types/song';
 import { RandomCopyButton } from './RandomCopyButton';
 
@@ -34,13 +35,9 @@ export const FiltersPanel = ({
 			callback(event.target.value || null);
 		};
 
-	const assetBase =
-		(import.meta.env.BASE_URL ?? '/') === '/'
-			? '/'
-			: `${(import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')}/`;
 	const avatarSrc = siteConfig.profile.avatar.startsWith('http')
 		? siteConfig.profile.avatar
-		: `${assetBase}${siteConfig.profile.avatar.replace(/^\/+/, '')}`;
+		: withBase(siteConfig.profile.avatar);
 
 	return (
 		<section className="glass-panel mb-8 space-y-6 p-6 shadow-card">

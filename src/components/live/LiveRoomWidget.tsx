@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { siteConfig } from '../../config/site';
+import { withBase } from '../../lib/url/withBase';
 
 interface LiveStatusState {
 	isLive: boolean;
@@ -109,14 +110,10 @@ const parseLiveStatus = (payload: unknown): LiveStatusState => {
 
 export const LiveRoomWidget = () => {
 	const config = siteConfig.liveRoom;
-	const assetBase =
-		(import.meta.env.BASE_URL ?? '/') === '/'
-			? '/'
-			: `${(import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')}/`;
 	const resolveAssetPath = (path: string | undefined) => {
 		if (!path) return undefined;
 		if (/^https?:\/\//.test(path)) return path;
-		return `${assetBase}${path.replace(/^\/+/, '')}`;
+		return withBase(path);
 	};
 	const profileFallback = resolveAssetPath(siteConfig.profile.avatar);
 
