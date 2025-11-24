@@ -41,10 +41,11 @@ export const SongExplorer = ({ dataset }: SongExplorerProps) => {
 
 	const copySongTitle = useCallback(async (song: SongRecord) => {
 		const text = song.title;
+		const scSuffix = song.sc ? '（SC 曲目）' : '';
 		try {
 			if (typeof navigator !== 'undefined' && navigator.clipboard) {
 				await navigator.clipboard.writeText(text);
-				setToastMessage(`已复制：${text}`);
+				setToastMessage(`已复制：${text}${scSuffix}`);
 				return;
 			}
 		} catch (error) {
