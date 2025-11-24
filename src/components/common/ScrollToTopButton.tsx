@@ -11,21 +11,35 @@ export const ScrollToTopButton = ({ className }: ScrollToTopButtonProps) => {
 	const [visible, setVisible] = useState(false);
 
 	useEffect(() => {
+		if (typeof window === 'undefined') {
+			return;
+		}
+
 		const handleScroll = () => {
 			const current =
 				window.scrollY ||
-				document.documentElement.scrollTop ||
-				document.body.scrollTop ||
+				document.scrollingElement?.scrollTop ||
+				document.documentElement?.scrollTop ||
+				document.body?.scrollTop ||
 				0;
 			setVisible(current > SCROLL_THRESHOLD);
 		};
 
 		handleScroll();
+
 		window.addEventListener('scroll', handleScroll, { passive: true });
-		return () => window.removeEventListener('scroll', handleScroll);
+		document.addEventListener('scroll', handleScroll, { passive: true });
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+			document.removeEventListener('scroll', handleScroll);
+		};
 	}, []);
 
 	const handleClick = () => {
+		if (typeof window === 'undefined') {
+			return;
+		}
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	};
 

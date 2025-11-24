@@ -122,7 +122,9 @@ export const LiveRoomWidget = ({ className }: LiveRoomWidgetProps) => {
 	const profileFallback = resolveAssetPath(siteConfig.profile.avatar);
 
 	const [isExpanded, setIsExpanded] = useState(true);
-	const [isDesktop, setIsDesktop] = useState(true);
+	const [isDesktop, setIsDesktop] = useState(
+		typeof window !== 'undefined' ? window.innerWidth >= 768 : false
+	);
 	const [status, setStatus] = useState<LiveStatusState>({
 		isLive: false,
 		title: '直播间',

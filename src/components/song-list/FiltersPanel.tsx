@@ -43,34 +43,41 @@ export const FiltersPanel = ({
 
 	const [expanded, setExpanded] = useState(true);
 	const [isCompact, setIsCompact] = useState(false);
+	const [layoutReady, setLayoutReady] = useState(false);
 	const manualOverrideRef = useRef(false);
+	const headerRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		if (typeof window === 'undefined' || typeof ResizeObserver === 'undefined') {
+			setLayoutReady(true);
 			return;
 		}
+
+		const node = headerRef.current;
+		if (!node) {
+			setLayoutReady(true);
+			return;
+		}
+
+		const updateLayout = (width: number) => {
+			const compact = width < 640;
+			setIsCompact(compact);
+			if (!manualOverrideRef.current) {
+				setExpanded(!compact);
+			}
+		};
+
+		updateLayout(node.getBoundingClientRect().width);
 
 		const observer = new ResizeObserver((entries) => {
 			const entry = entries[0];
 			if (!entry) return;
-			const { width } = entry.contentRect;
-
-			const compact = width < 640;
-			setIsCompact(compact);
-
-			if (compact) {
-				if (!manualOverrideRef.current) {
-					setExpanded(false);
-				}
-			} else {
-				setExpanded(true);
-				manualOverrideRef.current = false;
-			}
+			updateLayout(entry.contentRect.width);
 		});
-		const element = document.getElementById('filters-panel-header');
-		if (element) {
-			observer.observe(element);
-		}
+
+		observer.observe(node);
+		setLayoutReady(true);
+
 		return () => observer.disconnect();
 	}, []);
 
@@ -78,13 +85,11 @@ export const FiltersPanel = ({
 		<section
 			className={clsx(
 				'glass-panel mb-8 flex flex-col p-6 shadow-card transition-[gap] duration-300',
-				expanded ? 'gap-6' : 'gap-4'
+				expanded ? 'gap-6' : 'gap-4',
+				layoutReady ? 'opacity-100' : 'opacity-0'
 			)}
 		>
-			<header
-				id="filters-panel-header"
-				className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
-			>
+			<header ref={headerRef} className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 				<div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
 					<div className="group relative aspect-square w-24 overflow-hidden rounded-full border border-border shadow-lg shadow-highlight/40 md:w-24 md:shrink-0">
 						<img
