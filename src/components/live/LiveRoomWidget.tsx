@@ -108,7 +108,11 @@ const parseLiveStatus = (payload: unknown): LiveStatusState => {
 	};
 };
 
-export const LiveRoomWidget = () => {
+interface LiveRoomWidgetProps {
+	className?: string;
+}
+
+export const LiveRoomWidget = ({ className }: LiveRoomWidgetProps) => {
 	const config = siteConfig.liveRoom;
 	const resolveAssetPath = (path: string | undefined) => {
 		if (!path) return undefined;
@@ -296,18 +300,10 @@ export const LiveRoomWidget = () => {
 	);
 
 	return (
-		<div className="fixed bottom-4 right-3 z-40 flex items-end gap-3 sm:bottom-6 sm:right-6">
-			<div
-				className={clsx(
-					'flex items-stretch transition-all duration-300 ease-out',
-					isExpanded
-						? 'translate-x-0 opacity-100 pointer-events-auto'
-						: 'translate-x-[calc(100%+1rem)] opacity-0 pointer-events-none'
-				)}
-				id="live-room-panel"
-				aria-hidden={!isExpanded}
-			>
-				<div className="relative w-[286px] max-w-[80vw] overflow-hidden rounded-2xl border border-border/50 shadow-2xl shadow-highlight/40 backdrop-blur-xl">
+		<div className={clsx('flex flex-col items-end gap-2', className)}>
+			{isExpanded && (
+				<div className="flex items-stretch gap-1 transition duration-300">
+					<div className="relative w-[286px] max-w-[80vw] overflow-hidden rounded-2xl border border-border/50 shadow-2xl shadow-highlight/40 backdrop-blur-xl">
 					<div
 						role="link"
 						tabIndex={0}
@@ -359,13 +355,13 @@ export const LiveRoomWidget = () => {
 									previewActive && status.isLive ? 'opacity-0' : 'opacity-100 group-hover:opacity-95'
 								)}
 							>
-								{status.isLive && !loading && (
+								{/* {status.isLive && !loading && (
 									<div className="absolute inset-x-5 top-6 flex justify-center">
 										<div className="max-w-full truncate text-center text-sm font-semibold text-text-primary sm:text-base">
 											{status.title}
 										</div>
 									</div>
-								)}
+								)} */}
 								<div className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full bg-black/40 px-2.5 py-1">
 									<span
 										className={clsx(
@@ -406,22 +402,21 @@ export const LiveRoomWidget = () => {
 						&gt;
 					</button>
 				</div>
-			</div>
+				</div>
+			)}
 
 			{!isExpanded && (
 				<button
 					type="button"
 					onClick={() => setIsExpanded(true)}
-					className="glass-panel flex items-center gap-2 rounded-full border border-border/60 bg-surface/90 px-4 py-2 text-sm font-medium text-text-primary shadow-lg shadow-highlight/30 transition hover:border-accent hover:text-accent"
+					className="glass-panel flex min-w-[120px] items-center gap-2 rounded-full border border-border/60 bg-surface/90 px-4 py-2 text-sm font-medium text-text-primary shadow-lg shadow-highlight/30 transition hover:border-accent hover:text-accent"
 					aria-expanded={isExpanded}
 					aria-controls="live-room-panel"
 				>
 					<span
 						className={clsx(
 							'h-2.5 w-2.5 rounded-full',
-							status.isLive
-								? 'bg-status-featured shadow-[0_0_12px_rgba(255,148,208,0.8)]'
-								: 'bg-text-muted'
+							status.isLive ? 'bg-status-featured shadow-[0_0_12px_rgba(255,148,208,0.8)]' : 'bg-text-muted'
 						)}
 					/>
 					<span>{status.isLive ? '直播中' : '直播间'}</span>

@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import { ScrollToTopButton } from '../components/common/ScrollToTopButton';
+import { LiveRoomWidget } from '../components/live/LiveRoomWidget';
 import { siteConfig } from '../config/site';
 import { theme } from '../config/theme';
 import { withBase } from '../lib/url/withBase';
@@ -118,6 +120,10 @@ const backgroundImage =
 			<main class="relative mx-auto flex min-h-screen w-full max-w-content flex-col px-4 pb-16 pt-8 md:px-8">
 				<slot />
 			</main>
+		</div>
+		<div class="fixed bottom-4 right-4 flex flex-col items-end gap-3 sm:right-6">
+			<ScrollToTopButton client:idle />
+			<LiveRoomWidget client:idle />
 		</div>
 	</body>
 </html>
