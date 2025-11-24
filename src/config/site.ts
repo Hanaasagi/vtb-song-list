@@ -9,6 +9,8 @@ export interface SiteProfileConfig {
 	avatar: string;
 	/** 头像的替代文本，利于可访问性。 */
 	avatarAlt: string;
+	/** 个人主页链接，头像点击后跳转到该地址。 */
+	homepageUrl: string;
 }
 
 export interface HeroContentConfig {
@@ -67,6 +69,7 @@ export const siteConfig: SiteConfig = {
 	profile: {
 		avatar: '/assets/avatar.jpg',
 		avatarAlt: '歌单主播头像',
+		homepageUrl: 'https://space.bilibili.com/7569822',
 	},
 	meta: {
 		title: '一起来听歌吧',

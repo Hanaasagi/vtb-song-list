@@ -91,7 +91,14 @@ export const FiltersPanel = ({
 		>
 			<header ref={headerRef} className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 				<div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
-					<div className="group relative aspect-square w-24 overflow-hidden rounded-full border border-border shadow-lg shadow-highlight/40 md:w-24 md:shrink-0">
+					<a
+						href={siteConfig.profile.homepageUrl}
+						target="_blank"
+						rel="noreferrer noopener"
+						className="group relative aspect-square w-24 overflow-hidden rounded-full border border-border shadow-lg shadow-highlight/40 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface md:w-24 md:shrink-0"
+						aria-label="打开个人主页"
+						title="前往个人主页"
+					>
 						<img
 							src={avatarSrc}
 							alt={siteConfig.profile.avatarAlt}
@@ -99,7 +106,7 @@ export const FiltersPanel = ({
 							className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:rotate-[360deg] group-hover:scale-105"
 						/>
 						<span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/25 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
-					</div>
+					</a>
 
 					<div className="text-center md:text-left">
 						<h1 className="text-2xl font-semibold tracking-wide text-text-primary md:text-3xl">
