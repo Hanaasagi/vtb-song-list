@@ -12,7 +12,12 @@ export const ScrollToTopButton = ({ className }: ScrollToTopButtonProps) => {
 
 	useEffect(() => {
 		const handleScroll = () => {
-			setVisible(window.scrollY > SCROLL_THRESHOLD);
+			const current =
+				window.scrollY ||
+				document.documentElement.scrollTop ||
+				document.body.scrollTop ||
+				0;
+			setVisible(current > SCROLL_THRESHOLD);
 		};
 
 		handleScroll();
